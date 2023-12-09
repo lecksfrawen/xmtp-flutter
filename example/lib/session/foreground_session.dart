@@ -113,6 +113,7 @@ class ForegroundSession extends ChangeNotifier {
     await XmtpIsolate.spawn(keys);
     me = keys.wallet;
     initialized = true;
+    print("loadSaved() just changed initialized to == $initialized");
     return true;
   }
 
@@ -138,11 +139,18 @@ class ForegroundSession extends ChangeNotifier {
   /// It kills the background isolate, clears their authorized keys, and
   /// empties the database.
   Future<void> clear() async {
+    try {
+      var isolate = XmtpIsolate.find();
+    } catch (err) {
+      print(
+          "clear() just caught an error when trying to find an isolate: $err");
+    }
     await XmtpIsolate.kill();
     var prefs = await SharedPreferences.getInstance();
     await prefs.remove('xmtp.keys');
     await _db.clear();
     initialized = false;
+    print("clear() just changed initialized to == $initialized");
     notifyListeners();
   }
 }
