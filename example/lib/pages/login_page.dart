@@ -58,27 +58,39 @@ class LoginPage extends HookWidget {
                   }
                 },
               ),
-              
               ElevatedButton(
                 child: const Text('Create Random Wallet'),
                 onPressed: () async {
                   try {
                     print('Creating a random wallet...');
-                    var signer = EthPrivateKey.createRandom(Random.secure()).asSigner();
-                    print('Wallet created with address: ${await signer.address}');
+                    var signer =
+                        EthPrivateKey.createRandom(Random.secure()).asSigner();
+                    print(
+                        'Wallet created with address: ${await signer.address}');
                     print('Authorizing the wallet...');
                     bool isAuthorized = await session.authorize(signer);
                     print('Wallet authorized: $isAuthorized');
-                    print(context);
-                    print('Session: $session');
-                    print('Context: $context');
+                    if (isAuthorized) {
+                      await session.loadSaved();
+                    }
+                    // print(context);
+                    // print('Session: $session');
+                    // print('Context: $context');
+                    // Future.delayed(const Duration(seconds: 10), () {
+                    if (!context.mounted) return;
+                    print('Navigating to home2...');
                     context.goNamed('home');
+                    // print('Navigation to home completed.');
+                    // });
                     print('Navigation to home completed.');
                   } catch (e) {
-                    print('Errorf: $e');
+                    print('Error within Create Random Wallet: $e');
+                    if (e.toString().contains('already initialized')) {
+                      print('Already initialized, so just navigating to home');
+                      context.goNamed('home');
+                    }
                   } finally {
-                    print('Finally');
-                    context.goNamed('home');
+                    print('Finally, do nothing :D');
                   }
                 },
               ),
@@ -87,8 +99,11 @@ class LoginPage extends HookWidget {
                 onPressed: () async {
                   try {
                     print('Creating a random wallet...');
-                    var wallet = EthPrivateKey.fromHex('953bcdf6bbb41880dcc2f78d7a29b922aff84b4278ff6f5126e99e35417cf720').asSigner();
-                    print('Wallet created with address: ${await wallet.address}');
+                    var wallet = EthPrivateKey.fromHex(
+                            '953bcdf6bbb41880dcc2f78d7a29b922aff84b4278ff6f5126e99e35417cf720')
+                        .asSigner();
+                    print(
+                        'Wallet created with address: ${await wallet.address}');
                     print('Authorizing the wallet...');
                     await session.authorize(wallet);
                     print('Wallet authorized.');
